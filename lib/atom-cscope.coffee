@@ -71,6 +71,9 @@ module.exports = AtomCscope =
         atom.notifications.addInfo "Disabled Cscope history!"
         @history = null
 
+    editor = atom.workspace.getActiveTextEditor()
+    text = editor.getSelectedText()
+    kw = if text is "" then editor.getWordUnderCursor() else text
     @viewModel = new AtomCscopeViewModel @subscriptions
     @setupEvents()
 
@@ -82,27 +85,28 @@ module.exports = AtomCscope =
       'atom-cscope:next': => @history?.openNext()
       'atom-cscope:prev': => @history?.openPrev()
 
-    @subscriptions.add atom.commands.add 'atom-workspace',
-      'atom-cscope:toggle-symbol': => @viewModel.togglePanelOption(0)
-      'atom-cscope:toggle-global-definition': => @viewModel.togglePanelOption(1)
-      'atom-cscope:toggle-functions-called-by': => @viewModel.togglePanelOption(2)
-      'atom-cscope:toggle-functions-calling': => @viewModel.togglePanelOption(3)
-      'atom-cscope:toggle-text-string': => @viewModel.togglePanelOption(4)
-      'atom-cscope:toggle-egrep-pattern': => @viewModel.togglePanelOption(6)
-      'atom-cscope:toggle-file': => @viewModel.togglePanelOption(7)
-      'atom-cscope:toggle-files-including': => @viewModel.togglePanelOption(8)
-      'atom-cscope:toggle-assignments-to': => @viewModel.togglePanelOption(9)
-
-    @subscriptions.add atom.commands.add 'atom-workspace',
-      'atom-cscope:find-symbol': => @autoInputFromCursor(0)
-      'atom-cscope:find-global-definition': => @autoInputFromCursor(1)
-      'atom-cscope:find-functions-called-by': => @autoInputFromCursor(2)
-      'atom-cscope:find-functions-calling': => @autoInputFromCursor(3)
-      'atom-cscope:find-text-string': => @autoInputFromCursor(4)
-      'atom-cscope:find-egrep-pattern': => @autoInputFromCursor(6)
-      'atom-cscope:find-file': => @autoInputFromCursor(7)
-      'atom-cscope:find-files-including': => @autoInputFromCursor(8)
-      'atom-cscope:find-assignments-to': => @autoInputFromCursor(9)
+    if not editor or kw.trim is ""
+        @subscriptions.add atom.commands.add 'atom-workspace',
+          'atom-cscope:find-symbol': => @viewModel.togglePanelOption(0)
+          'atom-cscope:find-global-definition': => @viewModel.togglePanelOption(1)
+          'atom-cscope:find-functions-called-by': => @viewModel.togglePanelOption(2)
+          'atom-cscope:find-functions-calling': => @viewModel.togglePanelOption(3)
+          'atom-cscope:find-text-string': => @viewModel.togglePanelOption(4)
+          'atom-cscope:find-egrep-pattern': => @viewModel.togglePanelOption(6)
+          'atom-cscope:find-file': => @viewModel.togglePanelOption(7)
+          'atom-cscope:find-files-including': => @viewModel.togglePanelOption(8)
+          'atom-cscope:find-assignments-to': => @viewModel.togglePanelOption(9)
+    else
+        @subscriptions.add atom.commands.add 'atom-workspace',
+          'atom-cscope:find-symbol': => @autoInputFromCursor(0)
+          'atom-cscope:find-global-definition': => @autoInputFromCursor(1)
+          'atom-cscope:find-functions-called-by': => @autoInputFromCursor(2)
+          'atom-cscope:find-functions-calling': => @autoInputFromCursor(3)
+          'atom-cscope:find-text-string': => @autoInputFromCursor(4)
+          'atom-cscope:find-egrep-pattern': => @autoInputFromCursor(6)
+          'atom-cscope:find-file': => @autoInputFromCursor(7)
+          'atom-cscope:find-files-including': => @autoInputFromCursor(8)
+          'atom-cscope:find-assignments-to': => @autoInputFromCursor(9)
 
     @subscriptions.add atom.config.observe 'atom-cscope.MaxCscopeResults', (newValue) =>
       @maxResults = newValue
@@ -110,15 +114,15 @@ module.exports = AtomCscope =
   autoInputFromCursor: (option) ->
     activeEditor = atom.workspace.getActiveTextEditor()
 
-    if not activeEditor?
-      atom.notifications.addError "Could not find text under cursor."
-      return
+    # if not activeEditor?
+    #   atom.notifications.addError "Could not find text under cursor."
+    #   return
 
     selectedText = activeEditor.getSelectedText()
     keyword = if selectedText is "" then activeEditor.getWordUnderCursor() else selectedText
-    if keyword.trim() == ""
-      atom.notifications.addError "Could not find text under cursor."
-      return
+    # if keyword.trim() == ""
+    #   atom.notifications.addError "Could not find text under cursor."
+    #   return
     @viewModel.show() if !@viewModel.isVisible()
     @viewModel.invokeSearch(option, keyword)
 

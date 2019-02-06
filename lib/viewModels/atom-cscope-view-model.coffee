@@ -51,22 +51,22 @@ class AtomCscopeViewModel
   setupEvents: () ->
     @model.onDataChange (itemName, newItem) =>
       @ractive.set itemName, newItem
-      
+
     @model.onDataUpdate (itemName, newItem) =>
       @ractive.merge itemName, newItem
 
     @view.onCancel (event) =>
       @hide()
-      
+
     @view.onMoveUp (event) =>
       @view.selectPrev()
-      
+
     @view.onMoveDown (event) =>
       @view.selectNext()
-      
+
     @view.onMoveToTop (event) =>
       @view.selectFirst()
-      
+
     @view.onMoveToBottom (event) =>
       @view.selectLast()
 
@@ -108,6 +108,8 @@ class AtomCscopeViewModel
         @view.clearSelection()
         @model.results data
         @view.stopLoading()
+        if data.length is 1
+            @openResult 0
       .catch () =>
         @view.stopLoading()
         @resetSearch()
@@ -139,7 +141,7 @@ class AtomCscopeViewModel
       model = @model.data.results[parseInt temp.pop()]
       @resultClickCallback model
       @view.selectItemView
-      
+
   onRefresh: (callback) ->
     @ractive.on 'refresh', (event) =>
       callback event

@@ -28,10 +28,10 @@ class ResultModel
     if info.isJustFile
       info.fileName = info.fileName.replace(/</g, '&lt;')
       info.fileName = info.fileName.replace(/>/g, '&gt;')
-      info.fileName = info.fileName.replace(@regex, '<span class="text-highlight bold">\$&</span>')
+      info.fileName = info.fileName.replace(@regex, '&nbsp;&nbsp;<span class="text-highlight bold">\$&</span>')
     else
       info.codeLine = info.codeLine.replace(/</g, '&lt;')
       info.codeLine = info.codeLine.replace(/>/g, '&gt;')
-      info.codeLine = info.codeLine.replace(@regex, '<span class="text-highlight bold">\$&</span>')
+      info.codeLine = info.codeLine.replace(@regex, '&nbsp;&nbsp;<span class="text-highlight bold">\$&</span>')
 
     return info
